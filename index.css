@@ -1,9 +1,9 @@
 .county {
   stroke: black;
-  stroke-width: 0.5;
+  stroke-width: 0.3;
 }
 .county:hover{
-  fill: black;
+  stroke-width: 1.5;
 }
 
 .circles {

@@ -24,11 +24,11 @@ var colorScale = d3.scaleLinear()
 // Promise allows multiple iterables to be passed through
 Promise.all([map, ACCESS]).then(function(values) {
 
+    // Combines map data with ACCESS data
     values[0].features.forEach(function(v_0) {
         var result = values[1].filter(function(v_1) {
             return v_1.County === v_0.properties.NAME;
         });
-        // delete v_0.COUNTY;
         v_0.data = (result[0] !== undefined) ? result[0] : null;
     });
 
