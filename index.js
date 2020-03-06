@@ -6,7 +6,7 @@ var svg = d3.select("div#container").append("svg")
     .classed("svg-content", true);
 
 // Scales and centers map
-var projection = d3.geoMercator().translate([width/2, height/2]).scale(6000).center([-83.5,32.7]);
+var projection = d3.geoMercator().translate([width/2, height/2]).scale(6000).center([-83.5,32.35]);
 var path = d3.geoPath().projection(projection);
 
 var map = d3.json("map_data/ga_counties.json");
@@ -17,9 +17,51 @@ var tooltip = d3.select("body").append("div")
     .style("opacity", 0);
 
 var colorScale = d3.scaleLinear()
-    .range(["#2c7bb6","#00ccbc","#90eb9d",
-    "#f9d057","#f29e2e","#d7191c"])
+    .range(["#2c7bb6","#90eb9d","#ffff8c",
+            "#f9d057","#f29e2e","#d7191c"])
     .domain([0, 20, 40, 60, 80, 100]);
+
+// legend setup
+var legendWidth = 300
+var legendScale = d3.scaleLinear()
+    .range([-legendWidth/2, legendWidth/2])
+    .domain([0, 100]);
+
+var defs = svg.append("defs");
+
+var linearGradient = defs.append("linearGradient")
+    .attr("id", "linear-gradient")
+    .attr("x1", "0%")
+    .attr("y1", "0%")
+    .attr("x2", "100%")
+    .attr("y2", "0%");
+
+linearGradient.selectAll("stop")
+    .data(colorScale.range())
+    .enter()
+    .append("stop")
+    .attr("offset", function(d,i) { return i/(colorScale.range().length-1); })
+    .attr("stop-color", function(d) { return d; });
+
+var legendAxis = d3.axisBottom()
+    .scale(legendScale);
+
+// draw legend
+var legendSvg = svg.append('g')
+    .attr('class', 'legendWrapper')
+    .attr('transform', 'translate(550, 620)');
+    
+legendSvg.append("rect")
+    .attr("width", legendWidth)
+    .attr("height", 10)
+    .style("fill", "url(#linear-gradient)");
+
+legendSvg.append("text")
+	.attr("class", "legendTitle")
+	.attr("x", 149.5)
+	.attr("y", -10)
+	.style("text-anchor", "middle")
+	.text("% of Population with Low Access to Food");
 
 // Promise allows multiple iterables to be passed through
 Promise.all([map, access]).then(function(values) {
@@ -55,44 +97,9 @@ Promise.all([map, access]).then(function(values) {
             .duration(500)
             .style("opacity", 0);
         });
+    // legend axis
     legendSvg.append("g")
         .attr("class", "axis")
-        .attr("transform", "translate(0," + (149.5) + ")")
+        .attr("transform", "translate(149.5," + (10) + ")")
         .call(legendAxis);
 });
-
-// legend setup
-var legendHeight = 300
-var legendScale = d3.scaleLinear()
-    .range([-legendHeight/2, legendHeight/2])
-    .domain([100, 0]);
-
-var defs = svg.append("defs");
-
-var linearGradient = defs.append("linearGradient")
-    .attr("id", "linear-gradient")
-    .attr("x1", "0%")
-    .attr("y1", "100%")
-    .attr("x2", "0%")
-    .attr("y2", "0%");
-
-linearGradient.selectAll("stop")
-    .data(colorScale.range())
-    .enter()
-    .append("stop")
-    .attr("offset", function(d,i) { return i/(colorScale.range().length-1); })
-    .attr("stop-color", function(d) { return d; });
-
-var legendAxis = d3.axisLeft()
-    .scale(legendScale)
-    .tickSize(0);
-
-// draw legend
-var legendSvg = svg.append('g')
-    .attr('class', 'legendWrapper')
-    .attr('transform', 'translate(300, 150)');
-    
-legendSvg.append("rect")
-    .attr("width", 20)
-    .attr("height", legendHeight)
-    .style("fill", "url(#linear-gradient)");
