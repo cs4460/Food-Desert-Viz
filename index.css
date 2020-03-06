@@ -43,3 +43,8 @@ div.tooltip {
   fill: #4F4F4F;
   font-weight: 300;
 }
+
+.axis text {
+  fill: #404040;
+  font-weight: 400;
+}

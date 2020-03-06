@@ -17,9 +17,8 @@ var tooltip = d3.select("body").append("div")
     .style("opacity", 0);
 
 var colorScale = d3.scaleLinear()
-    .range(["#2c7bb6","#90eb9d","#ffff8c",
-            "#f9d057","#f29e2e","#d7191c"])
-    .domain([0, 20, 40, 60, 80, 100]);
+    .range(['#9e0142','#d53e4f','#f46d43','#fdae61','#fee08b','#e6f598','#abdda4','#66c2a5','#3288bd','#5e4fa2'])
+    .domain([100, 90, 80, 70, 60, 50, 40, 30, 20, 10, 0]);
 
 // legend setup
 var legendWidth = 300
