@@ -30,9 +30,9 @@ var defs = svg.append("defs");
 
 var linearGradient = defs.append("linearGradient")
     .attr("id", "linear-gradient")
-    .attr("x1", "0%")
+    .attr("x1", "100%")
     .attr("y1", "0%")
-    .attr("x2", "100%")
+    .attr("x2", "0%")
     .attr("y2", "0%");
 
 linearGradient.selectAll("stop")
