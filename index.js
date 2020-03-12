@@ -17,8 +17,8 @@ var tooltip = d3.select("body").append("div")
     .style("opacity", 0);
 
 var colorScale = d3.scaleLinear()
-    .range(['#9e0142','#d53e4f','#f46d43','#fdae61','#fee08b','#e6f598','#abdda4','#66c2a5','#3288bd','#5e4fa2'])
-    .domain([100, 90, 80, 70, 60, 50, 40, 30, 20, 10, 0]);
+    .range(['#fef0d9','#fdcc8a','#fc8d59','#e34a33','#b30000'])
+    .domain([0, 20, 40, 60, 80, 100]);
 
 // legend setup
 var legendWidth = 300
@@ -30,9 +30,9 @@ var defs = svg.append("defs");
 
 var linearGradient = defs.append("linearGradient")
     .attr("id", "linear-gradient")
-    .attr("x1", "100%")
+    .attr("x1", "0%")
     .attr("y1", "0%")
-    .attr("x2", "0%")
+    .attr("x2", "100%")
     .attr("y2", "0%");
 
 linearGradient.selectAll("stop")
