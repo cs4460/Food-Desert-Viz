@@ -16,6 +16,7 @@ var tooltip = d3.select("body").append("div")
     .attr("class", "tooltip")       
     .style("opacity", 0);
 
+
 var colorScale = d3.scaleLinear()
     .range(['#fef0d9','#fdcc8a','#fc8d59','#e34a33','#b30000'])
     .domain([0, 20, 40, 60, 80, 100]);
@@ -25,6 +26,7 @@ var legendWidth = 300
 var legendScale = d3.scaleLinear()
     .range([-legendWidth/2, legendWidth/2])
     .domain([0, 100]);
+
 
 var defs = svg.append("defs");
 
@@ -96,6 +98,7 @@ Promise.all([map, access]).then(function(values) {
             .duration(500)
             .style("opacity", 0);
         });
+
     // legend axis
     legendSvg.append("g")
         .attr("class", "axis")
