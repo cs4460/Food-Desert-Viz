@@ -1,6 +1,8 @@
 var width = 1400;
 var height = 670;
-var svg = d3.select("div#container").append("svg")
+var selectedCounty;
+
+var svg = d3.select("body").append("svg")
     .attr("preserveAspectRatio", "xMinYMin meet")
     .attr("viewBox", "0 0 " + width + " " + height)
     .classed("svg-content", true);
@@ -9,14 +11,16 @@ var svg = d3.select("div#container").append("svg")
 var projection = d3.geoMercator().translate([width/2, height/2]).scale(6000).center([-83.5,32.35]);
 var path = d3.geoPath().projection(projection);
 
-var map = d3.json("map_data/ga_counties.json");
-var access = d3.csv("data/ACCESS.csv");
+// import data
+var map_data = d3.json("map_data/ga_counties.json");
+var access_data = d3.csv("data/ACCESS.csv");
+
 // Popup for county name when hovering
 var tooltip = d3.select("body").append("div") 
     .attr("class", "tooltip")       
     .style("opacity", 0);
 
-
+// Color Scale
 var colorScale = d3.scaleLinear()
     .range(['#fef0d9','#fdcc8a','#fc8d59','#e34a33','#b30000'])
     .domain([0, 20, 40, 60, 80, 100]);
@@ -62,11 +66,14 @@ legendSvg.append("text")
 	.attr("x", 149.5)
 	.attr("y", -10)
 	.style("text-anchor", "middle")
-	.text("% of Population with Low Access to Food");
+    .text("% of Population with Low Access to Food");
+    
+var g = svg.append("g");
 
-// Promise allows multiple iterables to be passed through
-Promise.all([map, access]).then(function(values) {
-    console.log(values[0]);
+// Waits for all promises to be fufilled
+// Anything with data runs in here
+Promise.all([map_data, access_data]).then(function(values) {
+
     // Combines map data with ACCESS data
     values[0].features.forEach(function(v_0) {
         var result = values[1].filter(function(v_1) {
@@ -76,7 +83,7 @@ Promise.all([map, access]).then(function(values) {
     });
 
     // draws map
-    svg.selectAll("path")
+    var map = g.selectAll("path")
         .data(values[0].features)
         .enter()
         .append("path")
@@ -85,19 +92,9 @@ Promise.all([map, access]).then(function(values) {
         .attr("fill", function(d) {
             return colorScale(d.data.PCT_LACCESS_POP15);
         })
-        .on("mouseover", function(d) {    
-            tooltip.transition()
-            .duration(200)
-            .style("opacity", .9);
-            tooltip.html(d.properties.NAME + "<br/>" + "Low Access: " + parseFloat(d.data.PCT_LACCESS_POP15).toFixed(2) + "%")
-            .style("left", (d3.event.pageX) + "px")
-            .style("top", (d3.event.pageY - 28) + "px");
-        })
-        .on("mouseout", function(d) {
-            tooltip.transition()
-            .duration(500)
-            .style("opacity", 0);
-        });
+        .on("mouseover", mouseover)
+        .on("mouseout", mouseout)
+        .on("click", clicked);
 
     // legend axis
     legendSvg.append("g")
@@ -105,3 +102,48 @@ Promise.all([map, access]).then(function(values) {
         .attr("transform", "translate(149.5," + (10) + ")")
         .call(legendAxis);
 });
+
+// functions
+function mouseover(d) {    
+    tooltip.transition()
+    .duration(200)
+    .style("opacity", .9);
+
+    tooltip.html(d.properties.NAME + "<br/>" + "Low Access: " + parseFloat(d.data.PCT_LACCESS_POP15).toFixed(2) + "%")
+    .style("left", (d3.event.pageX) + "px")
+    .style("top", (d3.event.pageY - 28) + "px");
+};
+
+function mouseout(d) {
+    tooltip.transition()
+    .duration(500)
+    .style("opacity", 0);
+};
+
+function clicked(d) {
+    var x, y, k;
+    
+    if (d && selectedCounty !== d) {
+        var centroid = path.centroid(d);
+        x = centroid[0];
+        y = centroid[1];
+        k = 4;
+        selectedCounty = d;
+    } else {
+        x = width / 2;
+        y = height / 2;
+        k = 1;
+        selectedCounty = null;
+    }
+
+    g.selectAll("path")
+        .classed("inactive", selectedCounty && function(d) { return !(d === selectedCounty); })
+        .classed("active", selectedCounty && function(d) { return d === selectedCounty; });
+    
+    g.transition()
+        .duration(750)
+        .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")scale(" + k + ")translate(" + -x + "," + -y + ")")
+        .style("stroke-width", 1.5 / k + "px");
+    
+
+}
