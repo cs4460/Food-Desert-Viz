@@ -138,6 +138,79 @@ let clayPovertyGrid = () =>{
     .attr("opacity", (d,i)=> i < 29 ? 1 : 0)
 }
 
+var barChartSvg = d3.select("#map").append("svg")
+margin = {
+  top: 20,
+  right: 20,
+  bottom: 30,
+  left: 50
+},
+width = +barChartSvg.attr("width") - margin.left - margin.right,
+height = +barChartSvg.attr("height") - margin.top - margin.bottom;
+g = barChartSvg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");;
+
+let clayDiabetesChart = () => {
+  var x = d3.scaleBand()
+    .rangeRound([0, width])
+    .padding(0.1);
+  
+  var y = d3.scaleLinear()
+    .rangeRound([height, 0]);
+    
+  var tooltip = d3.select("body").append("div")	
+    .attr("class", "tooltip")				
+    .style("opacity", 0);
+  
+  d3.csv("data/DHEALTH.csv").then(function (data) {
+    x.domain(data.map(function (d) {
+        return d.County;
+      }));
+    y.domain([0, d3.max(data, function (d) {
+          return Number(d.PCT_DIABETES_ADULTS13);
+        })]);
+  
+    g.append("g")
+    .attr("transform", "translate(0," + height + ")")
+    .call(d3.axisBottom(x))
+    .call(d3.axisLeft(y))
+    .append("text")
+    .attr("fill", "#000")
+    .attr("transform", "rotate(-90)")
+    .attr("y", -40)
+    .attr("dy", "0.71em")
+    .attr("text-anchor", "end")
+    .text("Diabetes Rate (% of pop) ")
+    .selectAll(".bar")
+    .data(data)
+    .enter().append("rect")
+    .attr("class", "bar")
+    .attr("x", function (d) {
+      return x(d.County);
+    })
+    .attr("y", function (d) {
+      return y(Number(d.PCT_DIABETES_ADULTS13));
+    })
+    .attr("width", x.bandwidth())
+    .attr("height", function (d) {
+      return height - y(Number(d.PCT_DIABETES_ADULTS13));
+    })
+    .on("mouseover", function(d) {		
+      tooltip.transition()		
+          .duration(200)		
+          .style("opacity", .9);		
+     tooltip.html((d.PCT_DIABETES_ADULTS13) + "<br/>"  + d.County)	
+          .style("left", (d3.event.pageX) + "px")		
+          .style("top", (d3.event.pageY - 28) + "px");	
+      })					
+    .on("mouseout", function(d) {		
+      tooltip.transition()		
+          .duration(500)		
+          .style("opacity", 0)	
+    });
+  
+  });
+}
+
 var mapSvg = d3.select("#map").append("svg")
         .attr("preserveAspectRatio", "xMinYMin meet")
         .attr("viewBox", "0 0 " + 1400 + " " + 650)
@@ -164,7 +237,7 @@ let geoVis = () => {
         return "#FFBF5D";
     })
     .attr("opacity", 0)
-
+  
 
     var width = 1200;
     var height = 650;
@@ -292,7 +365,9 @@ new scroll('div2', '55%', gaFoodGrid, gaGrid);
 new scroll('div4', '55%', clayGrid, gaFoodGrid);
 new scroll('div5', '55%', clayFoodGrid, clayGrid);
 new scroll('div6', '55%', clayPovertyGrid, clayFoodGrid);
-new scroll('div7', '25%', geoVis, clayPovertyGrid)
+new scroll('div7','55%', clayDiabetesChart, clayPovertyGrid);
+new scroll('div8', '25%', geoVis, clayDiabetesChart)
+
 
 
 //start grid on page load

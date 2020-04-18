@@ -119,3 +119,12 @@ strong{
   height: 500px;
   top: 200px;
 }
+
+.bar {
+  fill: #FFBF5D;
+}
+
+.bar:hover {
+  fill: #FF8E5D;
+}
+
