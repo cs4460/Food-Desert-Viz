@@ -1,67 +1,92 @@
 let svg = d3.select("svg");
 
-//svg width and height
 svg.attr('width',500)
     .attr('height',500)
 
-
-//set up grid spacing
 let spacing = 35;
 let rows = 10;
 let column = 8;
-let randnum = (min,max) => Math.round( Math.random() * (max-min) + min );
 
-//Create an array of objects
-let our_data = d3.range(51);
+let ga_data = d3.range(1002);
 
-//create group and join our data to that group
-let group = svg.selectAll('g')
-  .data(our_data)
-  .enter()
-  .append("g")
+let ga_group = svg.selectAll('g')
+    .data(ga_data)
+    .enter()
+    .append("g")
+let ga_rects = ga_group.append("rect")
 
-//create rectangles
-let rects = group.append("rect")
+let deleteAllRects = () => {
+    svg.selectAll('g')
+      .data([])
+      .exit()
+      .remove()
+}
 
+let addGaRects = () => {
+    ga_group = svg.selectAll('g')
+        .data(ga_data)
+        .enter()
+        .append("g")
+    svg.selectAll('g')
+        .data(ga_data)
+        .enter()
+        .append("g")
+    ga_rects = ga_group.append("rect")
+}
 
-let georgiaGrid = () =>{
-  rects
+let gaGrid = () =>{
+  deleteAllRects();
+  addGaRects();
+  ga_rects
     .transition()
-    .delay((d, i) => 10 * i)
+    .delay((d, i) => 1 * i)
     .duration(600)
-    .attr("width", 25)
-    .attr("height", 25)
-    .attr("rx", "60%")
-    .attr("ry", "50%")
-    .attr("x", (d, i) => i % column * spacing)
-    .attr("y", (d, i) => Math.floor(i / 8) % rows * spacing)
-    .attr("fill", "#FFBF5D")
+    .attr("width", 7)
+    .attr("height", 7)
+    .attr("rx", 5)
+    .attr("ry", 5)
+    .attr("x", (d, i) => i % 50 * 10)
+    .attr("y", (d, i) => Math.floor(i / 50) % 22 * 10)
+    .attr("fill", "#d5d8de")
     .attr("opacity", "1")
 }
 
-
-var arr = [];
-while(arr.length < 18){
-    var r = Math.floor(Math.random() * 50);
-    if(arr.indexOf(r) === -1) arr.push(r);
+var foodInsecureArr = [];
+while(foodInsecureArr.length < 163){
+    var r = Math.floor(Math.random() * 1002);
+    if(foodInsecureArr.indexOf(r) === -1) foodInsecureArr.push(r);
 }
 
-let gaFoodGrid = () =>{
-  rects
+let our_data = d3.range(51);
+let rects = []
+
+let addClayRects = () => {
+    let group = svg.selectAll('g')
+      .data(our_data)
+      .enter()
+      .append('g')
+
+    rects = group.append("rect")
+}
+
+let gaFoodGrid = () => {
+  ga_rects
     .transition()
-    .delay((d, i) => 10 * i)
+    .delay((d, i) => 1 * i)
     .duration(300)
-    .attr("width", 25)
-    .attr("height", 25)
-    .attr("rx", "60%")
-    .attr("ry", "50%")
-    .attr("x", (d, i) => i % column * spacing)
-    .attr("y", (d, i) => Math.floor(i / 8) % rows * spacing)
-    .attr("fill", (d, i) => (arr.indexOf(i) !== -1 ? "#FF8E5D" : "#FFBF5D"))
+    .attr("width", 7)
+    .attr("height", 7)
+    .attr("rx", "5")
+    .attr("ry", "5")
+    .attr("x", (d, i) => i % 50 * 10)
+    .attr("y", (d, i) => Math.floor(i / 50) % 22 * 10)
+    .attr("fill", (d, i) => (foodInsecureArr.indexOf(i) !== -1 ? "#FF8E5D" : "#d5d8de"))
 }
 
 
 let clayGrid = () =>{
+  deleteAllRects();
+  addClayRects();
   rects
     .transition()
     .delay((d, i) => 10 * i)
@@ -92,6 +117,7 @@ let clayFoodGrid = () =>{
 }
 
 let clayPovertyGrid = () =>{
+  d3.select("#viz").style("position", "fixed");
   rects
     .transition()
     .delay((d, i) => 10 * i)
@@ -118,6 +144,8 @@ var mapSvg = d3.select("#map").append("svg")
         .classed("svg-content", true);
 
 let geoVis = () => {
+    d3.select("#viz").style("position", "relative");
+    
     rects
     .transition()
     .delay((d, i) => 10 * i)
@@ -138,11 +166,11 @@ let geoVis = () => {
     .attr("opacity", 0)
 
 
-    var width = 1400;
+    var width = 1200;
     var height = 650;
 
     // Scales and centers map
-    var projection = d3.geoMercator().translate([width/2, height/2]).scale(4000).center([-78.5,31.7]);
+    var projection = d3.geoMercator().translate([width/2, height/2]).scale(4000).center([-82.6,31.7]);
     var path = d3.geoPath().projection(projection);
 
     var map = d3.json("map_data/ga_counties.json");
@@ -186,7 +214,7 @@ let geoVis = () => {
     // draw legend
     var legendSvg = mapSvg.append('g')
         .attr('class', 'legendWrapper')
-        .attr('transform', 'translate(240, 500)');
+        .attr('transform', 'translate(420, 500)');
         
     legendSvg.append("rect")
         .attr("width", legendWidth)
@@ -195,7 +223,7 @@ let geoVis = () => {
 
     legendSvg.append("text")
         .attr("class", "legendTitle")
-        .attr("x", 149.5)
+        .attr("x", 160.5)
         .attr("y", -10)
         .style("text-anchor", "middle")
         .style("margin", "-100px")
@@ -260,7 +288,7 @@ function scroll(n, offset, func1, func2){
 
 
 //triger these functions on page scroll
-new scroll('div2', '55%', gaFoodGrid, georgiaGrid);
+new scroll('div2', '55%', gaFoodGrid, gaGrid);
 new scroll('div4', '55%', clayGrid, gaFoodGrid);
 new scroll('div5', '55%', clayFoodGrid, clayGrid);
 new scroll('div6', '55%', clayPovertyGrid, clayFoodGrid);
@@ -268,4 +296,4 @@ new scroll('div7', '25%', geoVis, clayPovertyGrid)
 
 
 //start grid on page load
-georgiaGrid();
+gaGrid();
