@@ -134,9 +134,9 @@ let clayPovertyGrid = () =>{
     .attr("opacity", (d,i)=> i < 29 ? 1 : 0)
 }
 
-
 let barchart = () => {
     d3.select("#viz").style("position", "fixed");
+    d3.selectAll("#map").remove();
     rects
         .transition()
         .delay((d, i) => 0.1 * i)
@@ -215,14 +215,18 @@ let barchart = () => {
 }
 
 
-var mapSvg = d3.select("#map").append("svg")
-        .attr("preserveAspectRatio", "xMinYMin meet")
-        .attr("viewBox", "0 0 " + 1400 + " " + 650)
-        .classed("svg-content", true);
-
 let geoVis = () => {
     d3.select("#viz").style("position", "relative");
     d3.selectAll('#barchart').remove();
+
+    var mapSvg = d3.select("#graphic")
+    .append("div")
+        .attr("id", "map")
+        .classed("svg-container", true)
+        .append("svg")
+            .attr("preserveAspectRatio", "xMinYMin meet")
+            .attr("viewBox", "0 0 " + 1400 + " " + 650)
+            .classed("svg-content", true);
     
     rects
     .transition()
