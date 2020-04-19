@@ -1,6 +1,6 @@
 let svg = d3.select("svg");
 
-svg.attr('width',500)
+svg.attr('width',600)
     .attr('height',500)
 
 let spacing = 35;
@@ -27,14 +27,10 @@ let addGaRects = () => {
         .data(ga_data)
         .enter()
         .append("g")
-    svg.selectAll('g')
-        .data(ga_data)
-        .enter()
-        .append("g")
     ga_rects = ga_group.append("rect")
 }
 
-let gaGrid = () =>{
+let gaGrid = () => {
   deleteAllRects();
   addGaRects();
   ga_rects
@@ -117,7 +113,7 @@ let clayFoodGrid = () =>{
 }
 
 let clayPovertyGrid = () =>{
-  d3.select("#viz").style("position", "fixed");
+  d3.selectAll('#barchart').remove();
   rects
     .transition()
     .delay((d, i) => 10 * i)
@@ -138,6 +134,87 @@ let clayPovertyGrid = () =>{
     .attr("opacity", (d,i)=> i < 29 ? 1 : 0)
 }
 
+
+let barchart = () => {
+    d3.select("#viz").style("position", "fixed");
+    rects
+        .transition()
+        .delay((d, i) => 0.1 * i)
+        .duration(300)
+        .attr("opacity", 0)
+
+    var margin = {
+        top: 10,
+        right: 20,
+        bottom: 30,
+        left: 50
+    },
+    width = 600 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom,
+    barchart = svg.append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+    .attr("id", "barchart");
+
+    var parseTime = d3.timeParse("%d-%b-%y");
+
+    var x = d3.scaleBand()
+        .rangeRound([0, width])
+        .padding(0.1);
+
+    var y = d3.scaleLinear()
+      .rangeRound([height, 0]);
+
+    var div = d3.select("body").append("div")   
+      .attr("class", "tooltip")             
+      .style("opacity", 0);
+
+    d3.csv("DHEALTH.csv").then(function (data) {
+        x.domain(data.map(function (d) {
+            return d.County;
+        }));
+        y.domain([0, d3.max(data, function (d) {
+            return Number(d.PCT_DIABETES_ADULTS13);
+        })]);
+
+        barchart.append("g")
+            .attr("transform", "translate(0," + height + ")")
+            .call(d3.axisBottom(x))
+
+        barchart.append("g")
+        .call(d3.axisLeft(y))
+        .append("text")
+        .attr("fill", "#000")
+        .attr("transform", "rotate(-90)")
+        .attr("y", -40)
+        .attr("dy", "0.71em")
+        .attr("text-anchor", "end")
+        .text("Diabetes Rate (% of pop) ");
+
+        bars = barchart.selectAll(".bar")
+        .data(data)
+        .enter().append("rect")
+        .attr("class", "bar")
+        .attr("fill", (d, i) => {
+            if (d.County == "Clay") {
+                return "#FF8E5D";
+            }
+            return "#FFBF5D";
+        })
+      
+        .attr("x", function (d) {
+            return x(d.County);
+        })
+        .attr("y", function (d) {
+            return y(Number(d.PCT_DIABETES_ADULTS13));
+        })
+        .attr("width", x.bandwidth())
+        .attr("height", function (d) {
+            return height - y(Number(d.PCT_DIABETES_ADULTS13));
+        })
+    });
+}
+
+
 var mapSvg = d3.select("#map").append("svg")
         .attr("preserveAspectRatio", "xMinYMin meet")
         .attr("viewBox", "0 0 " + 1400 + " " + 650)
@@ -145,6 +222,7 @@ var mapSvg = d3.select("#map").append("svg")
 
 let geoVis = () => {
     d3.select("#viz").style("position", "relative");
+    d3.selectAll('#barchart').remove();
     
     rects
     .transition()
@@ -166,11 +244,11 @@ let geoVis = () => {
     .attr("opacity", 0)
 
 
-    var width = 1200;
-    var height = 650;
+    var width = 2000;
+    var height = 900;
 
     // Scales and centers map
-    var projection = d3.geoMercator().translate([width/2, height/2]).scale(4000).center([-82.6,31.7]);
+    var projection = d3.geoMercator().translate([width/2, height/2]).scale(5000).center([-77.6,30.7]);
     var path = d3.geoPath().projection(projection);
 
     var map = d3.json("map_data/ga_counties.json");
@@ -214,7 +292,7 @@ let geoVis = () => {
     // draw legend
     var legendSvg = mapSvg.append('g')
         .attr('class', 'legendWrapper')
-        .attr('transform', 'translate(420, 500)');
+        .attr('transform', 'translate(350, 550)');
         
     legendSvg.append("rect")
         .attr("width", legendWidth)
@@ -223,7 +301,7 @@ let geoVis = () => {
 
     legendSvg.append("text")
         .attr("class", "legendTitle")
-        .attr("x", 160.5)
+        .attr("x", 149.5)
         .attr("y", -10)
         .style("text-anchor", "middle")
         .style("margin", "-100px")
@@ -231,7 +309,6 @@ let geoVis = () => {
 
     // Promise allows multiple iterables to be passed through
     Promise.all([map, access]).then(function(values) {
-        console.log(values[0]);
         // Combines map data with ACCESS data
         values[0].features.forEach(function(v_0) {
             var result = values[1].filter(function(v_1) {
@@ -289,10 +366,11 @@ function scroll(n, offset, func1, func2){
 
 //triger these functions on page scroll
 new scroll('div2', '55%', gaFoodGrid, gaGrid);
-new scroll('div4', '55%', clayGrid, gaFoodGrid);
-new scroll('div5', '55%', clayFoodGrid, clayGrid);
-new scroll('div6', '55%', clayPovertyGrid, clayFoodGrid);
-new scroll('div7', '25%', geoVis, clayPovertyGrid)
+new scroll('div3', '55%', clayGrid, gaFoodGrid);
+new scroll('div4', '55%', clayFoodGrid, clayGrid);
+new scroll('div5', '55%', clayPovertyGrid, clayFoodGrid);
+new scroll('div6', '75%', barchart, clayPovertyGrid)
+new scroll('div7', '75%', geoVis, barchart)
 
 
 //start grid on page load
