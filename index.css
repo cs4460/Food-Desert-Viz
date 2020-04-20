@@ -136,5 +136,30 @@ strong {
 }
 
 #div6 {
-  height: 700px;
+  height: 600px;
+}
+
+#div7 {
+  height: 300px;
+}
+#div8 {
+  display: flex;
+  flex-direction: column;
+  /* width: 100%; */
+  text-align: center;
+  font-size: 30px;
+  width: 300px;
+  height: 200px;
+  float: left;
+  /* margin-bottom: 800px; */
+  /* margin: auto; */
+  /* margin-bottom: 20px; */
+}
+
+#div8 p {
+  margin: 10px;
+}
+
+#map {
+  margin-top: -50px;
 }
