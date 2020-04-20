@@ -1,10 +1,24 @@
 .county {
   stroke: black;
   stroke-width: 0.3;
+  opacity: 1;
 }
 
-.county:hover{
-  stroke-width: 1.5;
+.active {
+  stroke: black;
+  stroke-width: 1.2;
+  opacity: 1;
+}
+
+.inactive {
+  stroke: black;
+  stroke-width: 0.3;
+  fill: grey;
+  opacity: 0.1;
+}
+
+.county:hover {
+  stroke-width: 1.2;
 }
 
 .labels {
@@ -15,9 +29,9 @@
 
 body {
   font-size: 1rem;
-  font-family: 'Open Sans', sans-serif;
+  font-family: "Open Sans", sans-serif;
   font-weight: 400;
-  fill: #8C8C8C;
+  fill: #8c8c8c;
   text-align: center;
 }
 
@@ -25,7 +39,7 @@ div.tooltip {
   position: absolute;
   text-align: center;
   width: 120px;
-  height: 28px;
+  height: 75px;
   padding: 2px;
   font: 12px sans-serif;
   background: #fff;
@@ -33,14 +47,16 @@ div.tooltip {
   pointer-events: none;
 }
 
-.axis path, .axis tick, .axis line {
+.axis path,
+.axis tick,
+.axis line {
   fill: none;
   stroke: none;
 }
 
 .legendTitle {
   font-size: 15px;
-  fill: #4F4F4F;
+  fill: #4f4f4f;
   font-weight: 300;
 }
 
