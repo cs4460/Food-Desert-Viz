@@ -264,6 +264,9 @@ let geoVis = () => {
   });
 
   function mouseover(d) {
+    if (d3.select(this).classed("inactive")) {
+      return;
+    }
     tooltip.transition().duration(200).style("opacity", 0.9);
 
     tooltip
