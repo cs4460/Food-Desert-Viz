@@ -202,24 +202,24 @@ let geoVis = () => {
 
   svg.transition().duration(300).attr("width", 0).attr("height", 0);
   //   svg.selectAll("*").remove();
-  rects
-    .transition()
-    .delay((d, i) => 10 * i)
-    .duration(300)
-    .attr("width", 25)
-    .attr("height", 25)
-    .attr("rx", "50%")
-    .attr("ry", "50%")
-    .attr("x", (d, i) => (i % column) * spacing)
-    .attr("y", (d, i) => (Math.floor(i / 8) % rows) * spacing)
-    .attr("fill", (d, i) => {
-      if (i <= 21) {
-        if (i <= 10) return "#D80808";
-        return "#FF8E5D";
-      }
-      return "#FFBF5D";
-    })
-    .attr("opacity", 0);
+  //   rects
+  //     .transition()
+  //     .delay((d, i) => 10 * i)
+  //     .duration(300)
+  //     .attr("width", 25)
+  //     .attr("height", 25)
+  //     .attr("rx", "50%")
+  //     .attr("ry", "50%")
+  //     .attr("x", (d, i) => (i % column) * spacing)
+  //     .attr("y", (d, i) => (Math.floor(i / 8) % rows) * spacing)
+  //     .attr("fill", (d, i) => {
+  //       if (i <= 21) {
+  //         if (i <= 10) return "#D80808";
+  //         return "#FF8E5D";
+  //       }
+  //       return "#FFBF5D";
+  //     })
+  //     .attr("opacity", 0);
   //   svg.selectAll("*").remove();
   var width = 1400;
   var height = 650;
