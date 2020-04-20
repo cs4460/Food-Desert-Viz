@@ -16,7 +16,7 @@
   stroke: black;
   stroke-width: 0.3;
   fill: grey;
-  opacity: 0.1;
+  opacity: 0;
 }
 
 .labels {
@@ -117,4 +117,8 @@ strong {
   max-width: 500px;
   height: 500px;
   top: 50px;
+}
+
+#div6 {
+  height: 400px;
 }

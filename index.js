@@ -27,8 +27,8 @@ let georgiaGrid = () => {
     .attr("height", 25)
     .attr("rx", "60%")
     .attr("ry", "50%")
-    .attr("x", (d, i) => (i % column) * spacing)
-    .attr("y", (d, i) => (Math.floor(i / 8) % rows) * spacing)
+    .attr("x", (d, i) => (i % column) * spacing + 50)
+    .attr("y", (d, i) => (Math.floor(i / 8) % rows) * spacing + 50)
     .attr("fill", "#FFBF5D")
     .attr("opacity", "1");
 };
@@ -48,8 +48,8 @@ let gaFoodGrid = () => {
     .attr("height", 25)
     .attr("rx", "60%")
     .attr("ry", "50%")
-    .attr("x", (d, i) => (i % column) * spacing)
-    .attr("y", (d, i) => (Math.floor(i / 8) % rows) * spacing)
+    .attr("x", (d, i) => (i % column) * spacing + 50)
+    .attr("y", (d, i) => (Math.floor(i / 8) % rows) * spacing + 50)
     .attr("fill", (d, i) => (arr.indexOf(i) !== -1 ? "#FF8E5D" : "#FFBF5D"));
 };
 
@@ -62,8 +62,8 @@ let clayGrid = () => {
     .attr("height", 25)
     .attr("rx", "50%")
     .attr("ry", "50%")
-    .attr("x", (d, i) => (i % column) * spacing)
-    .attr("y", (d, i) => (Math.floor(i / 8) % rows) * spacing)
+    .attr("x", (d, i) => (i % column) * spacing + 50)
+    .attr("y", (d, i) => (Math.floor(i / 8) % rows) * spacing + 50)
     .attr("fill", "#FFBF5D")
     .attr("opacity", (d, i) => (i < 29 ? 1 : 0));
 };
@@ -77,13 +77,16 @@ let clayFoodGrid = () => {
     .attr("height", 25)
     .attr("rx", "50%")
     .attr("ry", "50%")
-    .attr("x", (d, i) => (i % column) * spacing)
-    .attr("y", (d, i) => (Math.floor(i / 8) % rows) * spacing)
+    .attr("x", (d, i) => (i % column) * spacing + 50)
+    .attr("y", (d, i) => (Math.floor(i / 8) % rows) * spacing + 50)
     .attr("fill", (d, i) => (i <= 21 ? "#FF8E5D" : "#FFBF5D"))
     .attr("opacity", (d, i) => (i < 29 ? 1 : 0));
 };
 
 let clayPovertyGrid = () => {
+  svg.attr("width", 500).attr("height", 500);
+  mapSvg.selectAll("*").remove();
+  //   tooltip.selectAll("*").remove();
   rects
     .transition()
     .delay((d, i) => 10 * i)
@@ -92,8 +95,8 @@ let clayPovertyGrid = () => {
     .attr("height", 25)
     .attr("rx", "50%")
     .attr("ry", "50%")
-    .attr("x", (d, i) => (i % column) * spacing)
-    .attr("y", (d, i) => (Math.floor(i / 8) % rows) * spacing)
+    .attr("x", (d, i) => (i % column) * spacing + 50)
+    .attr("y", (d, i) => (Math.floor(i / 8) % rows) * spacing + 50)
     .attr("fill", (d, i) => {
       if (i <= 21) {
         if (i <= 10) return "#D80808";
@@ -107,11 +110,13 @@ let clayPovertyGrid = () => {
 var mapSvg = d3
   .select("#map")
   .append("svg")
-  .attr("preserveAspectRatio", "xMinYMin meet")
+  //   .attr("preserveAspectRatio", "xMinYMin meest")
   .attr("viewBox", "0 0 " + 1400 + " " + 650)
   .classed("svg-content", true);
 
 let geoVis = () => {
+  svg.attr("width", 0).attr("height", 0);
+  //   svg.selectAll("*").remove();
   rects
     .transition()
     .delay((d, i) => 10 * i)
@@ -238,8 +243,7 @@ let geoVis = () => {
     });
 
     // draws map
-    var map = g
-      .selectAll("path")
+    g.selectAll("path")
       .data(values[0].features)
       .enter()
       .append("path")
@@ -291,8 +295,8 @@ let geoVis = () => {
 
     if (d && selectedCounty !== d) {
       var centroid = path.centroid(d);
-      x = centroid[0];
-      y = centroid[1];
+      x = centroid[0] + 50;
+      y = centroid[1] + 20;
       k = 4;
       selectedCounty = d;
     } else {
