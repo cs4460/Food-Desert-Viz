@@ -109,10 +109,11 @@ let clayPovertyGrid = () => {
     })
     .attr("opacity", (d, i) => (i < 29 ? 1 : 0));
 };
+
 let barchart = () => {
   d3.select("#viz").style("position", "fixed");
-  mapSvg.selectAll("*").remove();
-  //   d3.selectAll("#map").remove();
+  d3.selectAll("#map").remove();
+  svg.transition().duration(300).attr("width", 500).attr("height", 500);
   rects
     .transition()
     .delay((d, i) => 0.1 * i)
@@ -124,7 +125,7 @@ let barchart = () => {
       bottom: 30,
       left: 50,
     },
-    width = 600 - margin.left - margin.right,
+    width = 570 - margin.left - margin.right,
     height = 500 - margin.top - margin.bottom,
     barchart = svg
       .append("g")
@@ -190,18 +191,19 @@ let barchart = () => {
   });
 };
 
-var mapSvg = d3
-  .select("#map")
-  .append("svg")
-  //   .attr("preserveAspectRatio", "xMinYMin meest")
-  .attr("viewBox", "0 0 " + 1400 + " " + 950)
-  .classed("svg-content", true);
-
 let geoVis = () => {
-  d3.selectAll("#barchart").remove();
-
+  d3.select("#viz").style("position", "relative");
+  d3.selectAll('#barchart').remove();
   svg.transition().duration(300).attr("width", 0).attr("height", 0);
-  //   svg.selectAll("*").remove();
+
+    var mapSvg = d3.select("#graphic")
+    .append("div")
+        .attr("id", "map")
+        .classed("svg-container", true)
+        .append("svg")
+            .attr("preserveAspectRatio", "xMinYMin meet")
+            .attr("viewBox", "0 0 " + 1400 + " " + 650)
+            .classed("svg-content", true);
   rects
     .transition()
     .delay((d, i) => 10 * i)
@@ -229,8 +231,8 @@ let geoVis = () => {
   var projection = d3
     .geoMercator()
     .translate([width / 2, height / 2])
-    .scale(4000)
-    .center([-78.5, 31.7]);
+    .scale(4700)
+    .center([-81, 31.7]);
   var path = d3.geoPath().projection(projection);
 
   var map = d3.json("map_data/ga_counties.json");
@@ -289,7 +291,7 @@ let geoVis = () => {
   var legendSvg = mapSvg
     .append("g")
     .attr("class", "legendWrapper")
-    .attr("transform", "translate(240, 500)");
+    .attr("transform", "translate(350, 500)");
 
   legendSvg
     .append("rect")
