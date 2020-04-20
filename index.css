@@ -1,6 +1,7 @@
 .county {
   stroke: black;
   stroke-width: 0.3;
+  opacity: 1;
 }
 
 .county:hover {
@@ -28,8 +29,8 @@
 div.tooltip {
   position: absolute;
   text-align: center;
-  width: 120px;
-  height: 75px;
+  width: auto;
+  height: auto;
   padding: 2px;
   font: 12px sans-serif;
   background: #fff;
@@ -139,5 +140,5 @@ strong {
 }
 
 #div6 {
-  height: 400px;
+  height: 500px;
 }

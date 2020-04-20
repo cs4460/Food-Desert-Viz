@@ -85,7 +85,10 @@ let clayFoodGrid = () => {
 
 let clayPovertyGrid = () => {
   svg.attr("width", 500).attr("height", 500);
-  mapSvg.selectAll("*").remove();
+  d3.selectAll("#barchart").remove();
+
+  //   d3.select("#viz").remove();
+  //   mapSvg.selectAll("*").remove();
   //   tooltip.selectAll("*").remove();
   rects
     .transition()
@@ -106,15 +109,97 @@ let clayPovertyGrid = () => {
     })
     .attr("opacity", (d, i) => (i < 29 ? 1 : 0));
 };
+let barchart = () => {
+  d3.select("#viz").style("position", "fixed");
+  mapSvg.selectAll("*").remove();
+  //   d3.selectAll("#map").remove();
+  rects
+    .transition()
+    .delay((d, i) => 0.1 * i)
+    .duration(300)
+    .attr("opacity", 0);
+  var margin = {
+      top: 10,
+      right: 20,
+      bottom: 30,
+      left: 50,
+    },
+    width = 600 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom,
+    barchart = svg
+      .append("g")
+      .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+      .attr("id", "barchart");
+  var parseTime = d3.timeParse("%d-%b-%y");
+  var x = d3.scaleBand().rangeRound([0, width]).padding(0.1);
+  var y = d3.scaleLinear().rangeRound([height, 0]);
+  var div = d3
+    .select("body")
+    .append("div")
+    .attr("class", "tooltip")
+    .style("opacity", 0);
+  d3.csv("DHEALTH.csv").then(function (data) {
+    x.domain(
+      data.map(function (d) {
+        return d.County;
+      })
+    );
+    y.domain([
+      0,
+      d3.max(data, function (d) {
+        return Number(d.PCT_DIABETES_ADULTS13);
+      }),
+    ]);
+    barchart
+      .append("g")
+      .attr("transform", "translate(0," + height + ")")
+      .call(d3.axisBottom(x));
+    barchart
+      .append("g")
+      .call(d3.axisLeft(y))
+      .append("text")
+      .attr("fill", "#000")
+      .attr("transform", "rotate(-90)")
+      .attr("y", -40)
+      .attr("dy", "0.71em")
+      .attr("text-anchor", "end")
+      .text("Diabetes Rate (% of pop) ");
+    bars = barchart
+      .selectAll(".bar")
+      .data(data)
+      .enter()
+      .append("rect")
+      .attr("class", "bar")
+      .attr("fill", (d, i) => {
+        if (d.County == "Clay") {
+          return "#FF8E5D";
+        }
+        return "#FFBF5D";
+      })
+
+      .attr("x", function (d) {
+        return x(d.County);
+      })
+      .attr("y", function (d) {
+        return y(Number(d.PCT_DIABETES_ADULTS13));
+      })
+      .attr("width", x.bandwidth())
+      .attr("height", function (d) {
+        return height - y(Number(d.PCT_DIABETES_ADULTS13));
+      });
+  });
+};
 
 var mapSvg = d3
   .select("#map")
   .append("svg")
   //   .attr("preserveAspectRatio", "xMinYMin meest")
-  .attr("viewBox", "0 0 " + 1400 + " " + 650)
+  .attr("viewBox", "0 0 " + 1400 + " " + 950)
   .classed("svg-content", true);
 
 let geoVis = () => {
+  d3.selectAll("#barchart").remove();
+
   svg.transition().duration(300).attr("width", 0).attr("height", 0);
   //   svg.selectAll("*").remove();
   rects
@@ -256,7 +341,7 @@ let geoVis = () => {
       .attr("class", "county")
       .attr("d", path)
       .attr("fill", function (d) {
-        return colorScale(d.data.Food_Percentage);
+        return colorScale(d.data.PCT_LACCESS_POP15);
       })
       .on("mouseover", mouseover)
       .on("mouseout", mouseout)
@@ -277,11 +362,8 @@ let geoVis = () => {
 
     tooltip
       .html(
-        d.properties.NAME +
-          "<br/>" +
-          "Food Desert Percentage: " +
-          parseFloat(d.data.Food_Percentage).toFixed(2) +
-          "%" +
+        "County Name: " +
+          d.properties.NAME +
           "<br/>" +
           "Low Access: " +
           parseFloat(d.data.PCT_LACCESS_POP15).toFixed(2) +
@@ -325,11 +407,7 @@ let geoVis = () => {
           "<h2>" +
           "2015" +
           "</h2>" +
-          "Food Desert Percentage: " +
-          parseFloat(d.data.Food_Percentage).toFixed(2) +
-          "%" +
-          "<br/>" +
-          "Low Access: " +
+          "Population Low Access: " +
           parseFloat(d.data.PCT_LACCESS_POP15).toFixed(2) +
           "%" +
           "<br/>" +
@@ -445,10 +523,11 @@ function scroll(n, offset, func1, func2) {
 
 //triger these functions on page scroll
 new scroll("div2", "55%", gaFoodGrid, georgiaGrid);
-new scroll("div4", "55%", clayGrid, gaFoodGrid);
-new scroll("div5", "55%", clayFoodGrid, clayGrid);
-new scroll("div6", "55%", clayPovertyGrid, clayFoodGrid);
-new scroll("div7", "25%", geoVis, clayPovertyGrid);
+new scroll("div3", "55%", clayGrid, gaFoodGrid);
+new scroll("div4", "55%", clayFoodGrid, clayGrid);
+new scroll("div5", "55%", clayPovertyGrid, clayFoodGrid);
+new scroll("div6", "75%", barchart, clayPovertyGrid);
+new scroll("div7", "45%", geoVis, barchart);
 
 //start grid on page load
 georgiaGrid();
