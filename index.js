@@ -477,6 +477,11 @@ let geoVis = () => {
       newDataTip.transition().duration(1).style("opacity", 0);
     }
 
+    var barWidth = 500,
+        barHeight = 500
+
+
+    
     g.selectAll("path")
       .classed(
         "inactive",
