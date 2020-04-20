@@ -109,10 +109,29 @@ let clayPovertyGrid = () => {
     })
     .attr("opacity", (d, i) => (i < 29 ? 1 : 0));
 };
+var tooltip = d3
+  .select("body")
+  .append("div")
+  .attr("class", "tooltip")
+  .style("opacity", 0);
+
+var newDataTip = d3
+  .select("body")
+  .append("div")
+  .attr("class", "newDataTip")
+  .style("opacity", 0);
+
 let barchart = () => {
+  //   if (tooltip !== undefined) {
+  tooltip.transition().duration(500).style("opacity", 0);
+  //   }
+  //   if (newDataTip) {
+  newDataTip.transition().duration(200).style("opacity", 0);
+  //   }
+
   d3.select("#viz").style("position", "fixed");
-  mapSvg.selectAll("*").remove();
-  //   d3.selectAll("#map").remove();
+  d3.selectAll("#map").remove();
+  svg.transition().duration(300).attr("width", 500).attr("height", 500);
   rects
     .transition()
     .delay((d, i) => 0.1 * i)
@@ -124,7 +143,7 @@ let barchart = () => {
       bottom: 30,
       left: 50,
     },
-    width = 600 - margin.left - margin.right,
+    width = 570 - margin.left - margin.right,
     height = 500 - margin.top - margin.bottom,
     barchart = svg
       .append("g")
@@ -190,36 +209,21 @@ let barchart = () => {
   });
 };
 
-var mapSvg = d3
-  .select("#map")
-  .append("svg")
-  //   .attr("preserveAspectRatio", "xMinYMin meest")
-  .attr("viewBox", "0 0 " + 1400 + " " + 950)
-  .classed("svg-content", true);
-
 let geoVis = () => {
+  d3.select("#viz").style("position", "relative");
   d3.selectAll("#barchart").remove();
-
   svg.transition().duration(300).attr("width", 0).attr("height", 0);
-  //   svg.selectAll("*").remove();
-  //   rects
-  //     .transition()
-  //     .delay((d, i) => 10 * i)
-  //     .duration(300)
-  //     .attr("width", 25)
-  //     .attr("height", 25)
-  //     .attr("rx", "50%")
-  //     .attr("ry", "50%")
-  //     .attr("x", (d, i) => (i % column) * spacing)
-  //     .attr("y", (d, i) => (Math.floor(i / 8) % rows) * spacing)
-  //     .attr("fill", (d, i) => {
-  //       if (i <= 21) {
-  //         if (i <= 10) return "#D80808";
-  //         return "#FF8E5D";
-  //       }
-  //       return "#FFBF5D";
-  //     })
-  //     .attr("opacity", 0);
+
+  var mapSvg = d3
+    .select("#graphic")
+    .append("div")
+    .attr("id", "map")
+    .classed("svg-container", true)
+    .append("svg")
+    .attr("preserveAspectRatio", "xMinYMin meet")
+    .attr("viewBox", "0 0 " + 1400 + " " + 850)
+    .classed("svg-content", true);
+
   //   svg.selectAll("*").remove();
   var width = 1400;
   var height = 650;
@@ -229,25 +233,25 @@ let geoVis = () => {
   var projection = d3
     .geoMercator()
     .translate([width / 2, height / 2])
-    .scale(4000)
-    .center([-78.5, 31.7]);
+    .scale(4700)
+    .center([-81, 31.7]);
   var path = d3.geoPath().projection(projection);
 
   var map = d3.json("map_data/ga_counties.json");
   var access = d3.csv("data/ACCESS.csv");
   var socio_data = d3.csv("data/SOCIOECONOMIC.csv");
   // Popup for county name when hovering
-  var tooltip = d3
-    .select("body")
-    .append("div")
-    .attr("class", "tooltip")
-    .style("opacity", 0);
+  //   var tooltip = d3
+  //     .select("body")
+  //     .append("div")
+  //     .attr("class", "tooltip")
+  //     .style("opacity", 0);
 
-  var newDataTip = d3
-    .select("body")
-    .append("div")
-    .attr("class", "newDataTip")
-    .style("opacity", 0);
+  //   var newDataTip = d3
+  //     .select("body")
+  //     .append("div")
+  //     .attr("class", "newDataTip")
+  //     .style("opacity", 0);
 
   var colorScale = d3
     .scaleLinear()
@@ -289,7 +293,7 @@ let geoVis = () => {
   var legendSvg = mapSvg
     .append("g")
     .attr("class", "legendWrapper")
-    .attr("transform", "translate(240, 500)");
+    .attr("transform", "translate(350, 500)");
 
   legendSvg
     .append("rect")
@@ -466,7 +470,7 @@ let geoVis = () => {
         //   parseFloat(d.data.PCT_LACCESS_POP10).toFixed(2) +
         //   "%"
       )
-      .style("left", d3.event.pageX - 300 + "px")
+      .style("left", d3.event.pageX - 500 + "px")
       .style("top", d3.event.pageY - 50 + "px");
 
     if (d3.select(this).classed("active")) {
