@@ -37,6 +37,25 @@ div.tooltip {
   pointer-events: none;
 }
 
+div.newDataTip {
+  position: absolute;
+  text-align: center;
+  width: 400px;
+  height: 300px;
+  padding: 2px;
+  font: 12px sans-serif;
+  background: #ddd;
+  border: 0px;
+  pointer-events: none;
+  margin: -100px;
+  text-align: left;
+  /* vertical-align: center; */
+}
+
+div.newDataTip h2 {
+  padding: 0px;
+  margin-bottom: 0px;
+}
 .axis path,
 .axis tick,
 .axis line {

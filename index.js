@@ -115,7 +115,7 @@ var mapSvg = d3
   .classed("svg-content", true);
 
 let geoVis = () => {
-  svg.attr("width", 0).attr("height", 0);
+  svg.transition().duration(300).attr("width", 0).attr("height", 0);
   //   svg.selectAll("*").remove();
   rects
     .transition()
@@ -156,6 +156,12 @@ let geoVis = () => {
     .select("body")
     .append("div")
     .attr("class", "tooltip")
+    .style("opacity", 0);
+
+  var newDataTip = d3
+    .select("body")
+    .append("div")
+    .attr("class", "newDataTip")
     .style("opacity", 0);
 
   var colorScale = d3
@@ -307,6 +313,86 @@ let geoVis = () => {
       y = height / 2;
       k = 1;
       selectedCounty = null;
+    }
+
+    newDataTip.transition().duration(200).style("opacity", 0.9);
+
+    newDataTip
+      .html(
+        "<h1>County Name: " +
+          d.properties.NAME +
+          "</h1>" +
+          "<h2>" +
+          "2015" +
+          "</h2>" +
+          "Food Desert Percentage: " +
+          parseFloat(d.data.Food_Percentage).toFixed(2) +
+          "%" +
+          "<br/>" +
+          "Low Access: " +
+          parseFloat(d.data.PCT_LACCESS_POP15).toFixed(2) +
+          "%" +
+          "<br/>" +
+          "Low Income and Low Access to stores: " +
+          parseFloat(d.data.PCT_LACCESS_LOWI15).toFixed(2) +
+          "%" +
+          "<br/>" +
+          "Households, no car & low access to store: " +
+          parseFloat(d.data.PCT_LACCESS_HHNV15).toFixed(2) +
+          "%" +
+          "<br/>" +
+          "SNAP households, low access to store: " +
+          parseFloat(d.data.PCT_LACCESS_SNAP15).toFixed(2) +
+          "%" +
+          "<br/>" +
+          "Children Low Access: " +
+          parseFloat(d.data.PCT_LACCESS_CHILD15).toFixed(2) +
+          "%" +
+          "<br/>" +
+          "Seniors Low Access: " +
+          parseFloat(d.data.PCT_LACCESS_SENIORS15).toFixed(2) +
+          "%" +
+          "<br/>" +
+          "White Low Access: " +
+          parseFloat(d.data.PCT_LACCESS_WHITE15).toFixed(2) +
+          "%" +
+          "<br/>" +
+          "Black Low Access: " +
+          parseFloat(d.data.PCT_LACCESS_BLACK15).toFixed(2) +
+          "%" +
+          "<br/>" +
+          "Hispanic Low Access: " +
+          parseFloat(d.data.PCT_LACCESS_HISP15).toFixed(2) +
+          "%" +
+          "<br/>" +
+          "Asian Low Access: " +
+          parseFloat(d.data.PCT_LACCESS_NHASIAN15).toFixed(2) +
+          "%" +
+          "<br/>" +
+          "Multiracial Low Access: " +
+          parseFloat(d.data.PCT_LACCESS_MULTIR15).toFixed(2) +
+          "%" +
+          "<br/>" +
+          "Poverty Rate: " +
+          parseFloat(d.socio_data.POVRATE15).toFixed(2) +
+          "%" +
+          "<br/>" +
+          "Child Poverty Rate: " +
+          parseFloat(d.socio_data.CHILDPOVRATE15).toFixed(2) +
+          "%"
+        //   "<br/>" +
+        //   "<h2>" +
+        //   "2010" +
+        //   "</h2>" +
+        //   "Low Access: " +
+        //   parseFloat(d.data.PCT_LACCESS_POP10).toFixed(2) +
+        //   "%"
+      )
+      .style("left", d3.event.pageX - 300 + "px")
+      .style("top", d3.event.pageY - 50 + "px");
+
+    if (d3.select(this).classed("active")) {
+      newDataTip.transition().duration(1).style("opacity", 0);
     }
 
     g.selectAll("path")
