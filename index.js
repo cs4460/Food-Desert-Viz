@@ -224,8 +224,7 @@ let geoVis = () => {
         .attr("id", "map")
         .classed("svg-container", true)
         .append("svg")
-            .attr("preserveAspectRatio", "xMinYMin meet")
-            .attr("viewBox", "0 0 " + 1400 + " " + 650)
+            .attr("viewBox", "0 0 " + 1400 + " " + 950)
             .classed("svg-content", true);
     
     rects
@@ -236,134 +235,229 @@ let geoVis = () => {
     .attr("height", 25)
     .attr("rx", "50%")
     .attr("ry", "50%")
-    .attr("x", (d, i) => i % column * spacing)
-    .attr("y", (d, i) => Math.floor(i / 8) % rows * spacing)
+    .attr("x", (d, i) => (i % column) * spacing)
+    .attr("y", (d, i) => (Math.floor(i / 8) % rows) * spacing)
     .attr("fill", (d, i) => {
-        if (i <= 21) {
-            if (i <= 10) return "#D80808";
-            return "#FF8E5D";
-        }
-        return "#FFBF5D";
+      if (i <= 21) {
+        if (i <= 10) return "#D80808";
+        return "#FF8E5D";
+      }
+      return "#FFBF5D";
     })
-    .attr("opacity", 0)
+    .attr("opacity", 0);
+  //   svg.selectAll("*").remove();
+  var width = 1400;
+  var height = 650;
+  var selectedCounty;
 
+  // Scales and centers map
+  var projection = d3
+    .geoMercator()
+    .translate([width / 2, height / 2])
+    .scale(4800)
+    .center([-81, 32]);
+  var path = d3.geoPath().projection(projection);
 
-    var width = 2000;
-    var height = 900;
+  var map = d3.json("map_data/ga_counties.json");
+  var access = d3.csv("data/ACCESS.csv");
+  var socio_data = d3.csv("data/SOCIOECONOMIC.csv");
+  // Popup for county name when hovering
+  var tooltip = d3
+    .select("body")
+    .append("div")
+    .attr("class", "tooltip")
+    .style("opacity", 0);
 
-    // Scales and centers map
-    var projection = d3.geoMercator().translate([width/2, height/2]).scale(5000).center([-77.6,30.7]);
-    var path = d3.geoPath().projection(projection);
+  var colorScale = d3
+    .scaleLinear()
+    .range(["#fef0d9", "#fdcc8a", "#fc8d59", "#e34a33", "#b30000"])
+    .domain([0, 20, 40, 60, 80, 100]);
 
-    var map = d3.json("map_data/ga_counties.json");
-    var access = d3.csv("data/ACCESS.csv");
-    // Popup for county name when hovering
-    var tooltip = d3.select("body").append("div") 
-        .attr("class", "tooltip")       
-        .style("opacity", 0);
+  // legend setup
+  var legendWidth = 300;
+  var legendScale = d3
+    .scaleLinear()
+    .range([-legendWidth / 2, legendWidth / 2])
+    .domain([0, 100]);
 
+  var defs = mapSvg.append("defs");
 
-    var colorScale = d3.scaleLinear()
-        .range(['#fef0d9','#fdcc8a','#fc8d59','#e34a33','#b30000'])
-        .domain([0, 20, 40, 60, 80, 100]);
+  var linearGradient = defs
+    .append("linearGradient")
+    .attr("id", "linear-gradient")
+    .attr("x1", "0%")
+    .attr("y1", "0%")
+    .attr("x2", "100%")
+    .attr("y2", "0%");
 
-    // legend setup
-    var legendWidth = 300
-    var legendScale = d3.scaleLinear()
-        .range([-legendWidth/2, legendWidth/2])
-        .domain([0, 100]);
-
-
-    var defs = mapSvg.append("defs");
-
-    var linearGradient = defs.append("linearGradient")
-        .attr("id", "linear-gradient")
-        .attr("x1", "0%")
-        .attr("y1", "0%")
-        .attr("x2", "100%")
-        .attr("y2", "0%");
-
-    linearGradient.selectAll("stop")
-        .data(colorScale.range())
-        .enter()
-        .append("stop")
-        .attr("offset", function(d,i) { return i/(colorScale.range().length-1); })
-        .attr("stop-color", function(d) { return d; });
-
-    var legendAxis = d3.axisBottom()
-        .scale(legendScale);
-
-    // draw legend
-    var legendSvg = mapSvg.append('g')
-        .attr('class', 'legendWrapper')
-        .attr('transform', 'translate(350, 550)');
-        
-    legendSvg.append("rect")
-        .attr("width", legendWidth)
-        .attr("height", 10)
-        .style("fill", "url(#linear-gradient)");
-
-    legendSvg.append("text")
-        .attr("class", "legendTitle")
-        .attr("x", 149.5)
-        .attr("y", -10)
-        .style("text-anchor", "middle")
-        .style("margin", "-100px")
-        .text("% of Population with Low Access to Food");
-
-    // Promise allows multiple iterables to be passed through
-    Promise.all([map, access]).then(function(values) {
-        // Combines map data with ACCESS data
-        values[0].features.forEach(function(v_0) {
-            var result = values[1].filter(function(v_1) {
-                return v_1.County === v_0.properties.NAME;
-            });
-            v_0.data = (result[0] !== undefined) ? result[0] : null;
-        });
-
-        // draws map
-        mapSvg.selectAll("path")
-            .data(values[0].features)
-            .enter()
-            .append("path")
-            .attr("class","county")
-            .attr("d", path)
-            .attr("fill", function(d) {
-                return colorScale(d.data.PCT_LACCESS_POP15);
-            })
-            .on("mouseover", function(d) {    
-                tooltip.transition()
-                .duration(200)
-                .style("opacity", .9);
-                tooltip.html(d.properties.NAME + "<br/>" + "Low Access: " + parseFloat(d.data.PCT_LACCESS_POP15).toFixed(2) + "%")
-                .style("left", (d3.event.pageX) + "px")
-                .style("top", (d3.event.pageY - 28) + "px");
-            })
-            .on("mouseout", function(d) {
-                tooltip.transition()
-                .duration(500)
-                .style("opacity", 0);
-            });
-
-        // legend axis
-        legendSvg.append("g")
-            .attr("class", "axis")
-            .attr("transform", "translate(149.5," + (10) + ")")
-            .call(legendAxis);
+  linearGradient
+    .selectAll("stop")
+    .data(colorScale.range())
+    .enter()
+    .append("stop")
+    .attr("offset", function (d, i) {
+      return i / (colorScale.range().length - 1);
+    })
+    .attr("stop-color", function (d) {
+      return d;
     });
 
+  var legendAxis = d3.axisBottom().scale(legendScale);
+
+  // draw legend
+  var legendSvg = mapSvg
+    .append("g")
+    .attr("class", "legendWrapper")
+    .attr("transform", "translate(350, 550)");
+
+  legendSvg
+    .append("rect")
+    .attr("width", legendWidth)
+    .attr("height", 10)
+    .style("fill", "url(#linear-gradient)");
+
+  legendSvg
+    .append("text")
+    .attr("class", "legendTitle")
+    .attr("x", 149.5)
+    .attr("y", -10)
+    .style("text-anchor", "middle")
+    .style("margin", "-100px")
+    .text("% of Population with Low Access and Low Income");
+
+  var g = mapSvg.append("g");
+
+  // Promise allows multiple iterables to be passed through
+  Promise.all([map, access, socio_data]).then(function (values) {
+    values[0].features.forEach(function (v_0) {
+      var result = values[1].filter(function (v_1) {
+        return v_1.County === v_0.properties.NAME;
+      });
+      v_0.data = result[0] !== undefined ? result[0] : null;
+    });
+
+    values[0].features.forEach(function (v_0) {
+      var result = values[2].filter(function (v_1) {
+        return v_1.County === v_0.properties.NAME;
+      });
+      v_0.socio_data =
+        result[0] !== undefined ? result[0] : console.log("null");
+
+      v_0.data.Food_Percentage =
+        (parseFloat(v_0.data.PCT_LACCESS_POP15) +
+          parseFloat(v_0.socio_data.POVRATE15)) /
+        2;
+    });
+
+    // draws map
+    g.selectAll("path")
+      .data(values[0].features)
+      .enter()
+      .append("path")
+      .attr("class", "county")
+      .attr("d", path)
+      .attr("fill", function (d) {
+        return colorScale(d.data.Food_Percentage);
+      })
+      .on("mouseover", mouseover)
+      .on("mouseout", mouseout)
+      .on("click", clicked);
+    // legend axis
+    legendSvg
+      .append("g")
+      .attr("class", "axis")
+      .attr("transform", "translate(149.5," + 10 + ")")
+      .call(legendAxis);
+  });
+
+  function mouseover(d) {
+    tooltip.transition().duration(200).style("opacity", 0.9);
+
+    tooltip
+      .html(
+        d.properties.NAME +
+          "<br/>" +
+          "Food Desert Percentage: " +
+          parseFloat(d.data.Food_Percentage).toFixed(2) +
+          "%" +
+          "<br/>" +
+          "Low Access: " +
+          parseFloat(d.data.PCT_LACCESS_POP15).toFixed(2) +
+          "%" +
+          "<br/>" +
+          "Poverty Rate: " +
+          parseFloat(d.socio_data.POVRATE15).toFixed(2) +
+          "%"
+      )
+      .style("left", d3.event.pageX + "px")
+      .style("top", d3.event.pageY - 28 + "px");
+  }
+
+  function mouseout(d) {
+    tooltip.transition().duration(500).style("opacity", 0);
+  }
+
+  function clicked(d) {
+    var x, y, k;
+
+    if (d && selectedCounty !== d) {
+      var centroid = path.centroid(d);
+      x = centroid[0] + 50;
+      y = centroid[1] + 20;
+      k = 4;
+      selectedCounty = d;
+    } else {
+      x = width / 2;
+      y = height / 2;
+      k = 1;
+      selectedCounty = null;
+    }
+
+    g.selectAll("path")
+      .classed(
+        "inactive",
+        selectedCounty &&
+          function (d) {
+            return !(d === selectedCounty);
+          }
+      )
+      .classed(
+        "active",
+        selectedCounty &&
+          function (d) {
+            return d === selectedCounty;
+          }
+      );
+
+    g.transition()
+      .duration(750)
+      .attr(
+        "transform",
+        "translate(" +
+          width / 2 +
+          "," +
+          height / 2 +
+          ")scale(" +
+          k +
+          ")translate(" +
+          -x +
+          "," +
+          -y +
+          ")"
+      )
+      .style("stroke-width", 1.5 / k + "px");
+  }
 }
 
-
 //waypoints scroll constructor
-function scroll(n, offset, func1, func2){
+function scroll(n, offset, func1, func2) {
   return new Waypoint({
     element: document.getElementById(n),
-    handler: function(direction) {
-       direction == 'down' ? func1() : func2();
+    handler: function (direction) {
+      direction == "down" ? func1() : func2();
     },
     //start 75% from the top of the div
-    offset: offset
+    offset: offset,
   });
 };
 
@@ -374,7 +468,7 @@ new scroll('div3', '55%', clayGrid, gaFoodGrid);
 new scroll('div4', '55%', clayFoodGrid, clayGrid);
 new scroll('div5', '55%', clayPovertyGrid, clayFoodGrid);
 new scroll('div6', '75%', barchart, clayPovertyGrid)
-new scroll('div7', '75%', geoVis, barchart)
+new scroll('div7', '45%', geoVis, barchart)
 
 
 //start grid on page load
