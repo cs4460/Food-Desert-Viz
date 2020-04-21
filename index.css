@@ -45,12 +45,11 @@ div.newDataTip {
   height: 300px;
   padding: 2px;
   font: 12px sans-serif;
-  background: #ddd;
-  border: 0px;
+  background: #fef0d9;
+  color: #34312E;
+  border: 1px;
+  border-color: #C2321B;
   pointer-events: none;
-  margin: -100px;
-  text-align: left;
-  /* vertical-align: center; */
 }
 
 div.newDataTip h2 {
@@ -145,15 +144,11 @@ strong {
 #div8 {
   display: flex;
   flex-direction: column;
-  /* width: 100%; */
   text-align: center;
   font-size: 30px;
-  width: 300px;
+  width: 500px;
   height: 200px;
   float: left;
-  /* margin-bottom: 800px; */
-  /* margin: auto; */
-  /* margin-bottom: 20px; */
 }
 
 #div8 p {
@@ -161,9 +156,10 @@ strong {
 }
 
 #map {
-  margin-top: -50px;
+  margin-top: -200px;
 }
 
 #transition {
-  margin-left: -75px;
+  margin-left: -200px;
+  margin-bottom: -900px;
 }

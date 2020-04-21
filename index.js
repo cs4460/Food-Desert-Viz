@@ -8,6 +8,7 @@ let spacing = 35;
 let rows = 10;
 let column = 8;
 let randnum = (min, max) => Math.round(Math.random() * (max - min) + min);
+let passedInsecurity = false;
 
 //Create an array of objects
 let our_data = d3.range(51);
@@ -17,6 +18,65 @@ let group = svg.selectAll("g").data(our_data).enter().append("g");
 
 //create rectangles
 let rects = group.append("rect");
+
+let ga_data = d3.range(1002);
+
+let ga_group = svg.selectAll('g')
+    .data(ga_data)
+    .enter()
+    .append("g")
+let ga_rects = ga_group.append("rect")
+
+let deleteAllRects = () => {
+    svg.selectAll('g')
+      .data([])
+      .exit()
+      .remove()
+}
+
+let addGaRects = () => {
+    ga_group = svg.selectAll('g')
+        .data(ga_data)
+        .enter()
+        .append("g")
+    ga_rects = ga_group.append("rect")
+}
+
+let gaGrid = () => {
+  deleteAllRects();
+  addGaRects();
+  d3.selectAll('#arrow').remove();
+  ga_rects
+    .transition()
+    .delay((d, i) => 1 * i)
+    .duration(600)
+    .attr("width", 7)
+    .attr("height", 7)
+    .attr("rx", 5)
+    .attr("ry", 5)
+    .attr("x", (d, i) => i % 50 * 10)
+    .attr("y", (d, i) => Math.floor(i / 50) % 22 * 10)
+    .attr("fill", "#FFDAA5")
+    .attr("opacity", "1")
+}
+
+var foodInsecureArr = [];
+while(foodInsecureArr.length < 163){
+    var r = Math.floor(Math.random() * 1002);
+    if(foodInsecureArr.indexOf(r) === -1) foodInsecureArr.push(r);
+}
+
+our_data = d3.range(51);
+rects = []
+
+let addClayRects = () => {
+    let group = svg.selectAll('g')
+      .data(our_data)
+      .enter()
+      .append('g')
+
+    rects = group.append("rect")
+}
 
 let georgiaGrid = () => {
   rects
@@ -40,20 +100,28 @@ while (arr.length < 18) {
 }
 
 let gaFoodGrid = () => {
-  rects
+  if (passedInsecurity) {
+    deleteAllRects();
+    addGaRects();
+    passedInsecurity = false;
+  }
+  ga_rects
     .transition()
-    .delay((d, i) => 10 * i)
+    .delay((d, i) => 1 * i)
     .duration(300)
-    .attr("width", 25)
-    .attr("height", 25)
-    .attr("rx", "60%")
-    .attr("ry", "50%")
-    .attr("x", (d, i) => (i % column) * spacing + 50)
-    .attr("y", (d, i) => (Math.floor(i / 8) % rows) * spacing + 50)
-    .attr("fill", (d, i) => (arr.indexOf(i) !== -1 ? "#FF8E5D" : "#FFBF5D"));
-};
+    .attr("width", 7)
+    .attr("height", 7)
+    .attr("rx", "5")
+    .attr("ry", "5")
+    .attr("x", (d, i) => i % 50 * 10)
+    .attr("y", (d, i) => Math.floor(i / 50) % 22 * 10)
+    .attr("fill", (d, i) => (foodInsecureArr.indexOf(i) !== -1 ? "#FF8E5D" : "#FFDAA5"))
+}
 
 let clayGrid = () => {
+  deleteAllRects();
+  addClayRects();
+  passedInsecurity = true;
   rects
     .transition()
     .delay((d, i) => 10 * i)
@@ -79,17 +147,13 @@ let clayFoodGrid = () => {
     .attr("ry", "50%")
     .attr("x", (d, i) => (i % column) * spacing + 50)
     .attr("y", (d, i) => (Math.floor(i / 8) % rows) * spacing + 50)
-    .attr("fill", (d, i) => (i <= 21 ? "#FF8E5D" : "#FFBF5D"))
+    .attr("fill", (d, i) => (i < 20 ? "#FF8E5D" : "#FFBF5D"))
     .attr("opacity", (d, i) => (i < 29 ? 1 : 0));
 };
 
 let clayPovertyGrid = () => {
   svg.attr("width", 500).attr("height", 500);
   d3.selectAll("#barchart").remove();
-
-  //   d3.select("#viz").remove();
-  //   mapSvg.selectAll("*").remove();
-  //   tooltip.selectAll("*").remove();
   rects
     .transition()
     .delay((d, i) => 10 * i)
@@ -101,8 +165,8 @@ let clayPovertyGrid = () => {
     .attr("x", (d, i) => (i % column) * spacing + 50)
     .attr("y", (d, i) => (Math.floor(i / 8) % rows) * spacing + 50)
     .attr("fill", (d, i) => {
-      if (i <= 21) {
-        if (i <= 10) return "#D80808";
+      if (i < 20) {
+        if (i <= 15) return "#D80808";
         return "#FF8E5D";
       }
       return "#FFBF5D";
@@ -401,7 +465,7 @@ let geoVis = () => {
       selectedCounty = null;
     }
 
-    newDataTip.transition().duration(200).style("opacity", 0.9);
+    newDataTip.transition().duration(200).style("opacity", 0.8);
 
     newDataTip
       .html(
@@ -470,7 +534,7 @@ let geoVis = () => {
         //   parseFloat(d.data.PCT_LACCESS_POP10).toFixed(2) +
         //   "%"
       )
-      .style("left", d3.event.pageX - 500 + "px")
+      .style("left", d3.event.pageX - 400 + "px")
       .style("top", d3.event.pageY - 50 + "px");
 
     if (d3.select(this).classed("active")) {
@@ -531,7 +595,7 @@ function scroll(n, offset, func1, func2) {
 }
 
 //triger these functions on page scroll
-new scroll("div2", "55%", gaFoodGrid, georgiaGrid);
+new scroll("div2", "55%", gaFoodGrid, gaGrid);
 new scroll("div3", "55%", clayGrid, gaFoodGrid);
 new scroll("div4", "55%", clayFoodGrid, clayGrid);
 new scroll("div5", "55%", clayPovertyGrid, clayFoodGrid);
@@ -539,4 +603,4 @@ new scroll("div6", "75%", barchart, clayPovertyGrid);
 new scroll("div7", "45%", geoVis, barchart);
 
 //start grid on page load
-georgiaGrid();
+gaGrid();
