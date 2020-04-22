@@ -21,31 +21,23 @@ let rects = group.append("rect");
 
 let ga_data = d3.range(1002);
 
-let ga_group = svg.selectAll('g')
-    .data(ga_data)
-    .enter()
-    .append("g")
-let ga_rects = ga_group.append("rect")
+let ga_group = svg.selectAll("g").data(ga_data).enter().append("g");
+let ga_rects = ga_group.append("rect");
 
 let deleteAllRects = () => {
-    svg.selectAll('g')
-      .data([])
-      .exit()
-      .remove()
-}
+  svg.selectAll("g").data([]).exit().remove();
+};
 
 let addGaRects = () => {
-    ga_group = svg.selectAll('g')
-        .data(ga_data)
-        .enter()
-        .append("g")
-    ga_rects = ga_group.append("rect")
-}
+  ga_group = svg.selectAll("g").data(ga_data).enter().append("g");
+  ga_rects = ga_group.append("rect");
+};
 
+//This is the first visualization to show the Georgia Population
 let gaGrid = () => {
   deleteAllRects();
   addGaRects();
-  d3.selectAll('#arrow').remove();
+  d3.selectAll("#arrow").remove();
   ga_rects
     .transition()
     .delay((d, i) => 1 * i)
@@ -54,30 +46,29 @@ let gaGrid = () => {
     .attr("height", 7)
     .attr("rx", 5)
     .attr("ry", 5)
-    .attr("x", (d, i) => i % 50 * 10)
-    .attr("y", (d, i) => Math.floor(i / 50) % 22 * 10)
+    .attr("x", (d, i) => (i % 50) * 10)
+    .attr("y", (d, i) => (Math.floor(i / 50) % 22) * 10)
     .attr("fill", "#FFDAA5")
-    .attr("opacity", "1")
-}
+    .attr("opacity", "1");
+};
 
+// This is needed to create the food insecure portion of the visualization to corretly get the number of boxes
 var foodInsecureArr = [];
-while(foodInsecureArr.length < 163){
-    var r = Math.floor(Math.random() * 1002);
-    if(foodInsecureArr.indexOf(r) === -1) foodInsecureArr.push(r);
+while (foodInsecureArr.length < 163) {
+  var r = Math.floor(Math.random() * 1002);
+  if (foodInsecureArr.indexOf(r) === -1) foodInsecureArr.push(r);
 }
 
 our_data = d3.range(51);
-rects = []
+rects = [];
 
 let addClayRects = () => {
-    let group = svg.selectAll('g')
-      .data(our_data)
-      .enter()
-      .append('g')
+  let group = svg.selectAll("g").data(our_data).enter().append("g");
 
-    rects = group.append("rect")
-}
+  rects = group.append("rect");
+};
 
+//This is the first visualization to show the Georgia Population
 let georgiaGrid = () => {
   rects
     .transition()
@@ -99,6 +90,7 @@ while (arr.length < 18) {
   if (arr.indexOf(r) === -1) arr.push(r);
 }
 
+// This is the georgia
 let gaFoodGrid = () => {
   if (passedInsecurity) {
     deleteAllRects();
@@ -113,11 +105,14 @@ let gaFoodGrid = () => {
     .attr("height", 7)
     .attr("rx", "5")
     .attr("ry", "5")
-    .attr("x", (d, i) => i % 50 * 10)
-    .attr("y", (d, i) => Math.floor(i / 50) % 22 * 10)
-    .attr("fill", (d, i) => (foodInsecureArr.indexOf(i) !== -1 ? "#FF8E5D" : "#FFDAA5"))
-}
+    .attr("x", (d, i) => (i % 50) * 10)
+    .attr("y", (d, i) => (Math.floor(i / 50) % 22) * 10)
+    .attr("fill", (d, i) =>
+      foodInsecureArr.indexOf(i) !== -1 ? "#FF8E5D" : "#FFDAA5"
+    );
+};
 
+// This is the first part of the claycounty visualization in the scrolly telling
 let clayGrid = () => {
   deleteAllRects();
   addClayRects();
@@ -185,14 +180,12 @@ var newDataTip = d3
   .attr("class", "newDataTip")
   .style("opacity", 0);
 
+// Creates barchart for visualziation of diabetes
 let barchart = () => {
-  //   if (tooltip !== undefined) {
+  // Needed to make sure tooltip doesn't stay after scrolling
   tooltip.transition().duration(500).style("opacity", 0);
-  //   }
-  //   if (newDataTip) {
   newDataTip.transition().duration(200).style("opacity", 0);
-  //   }
-
+  // These 3 lines are to make sure visualizations do not conflict. These are to re-drawn whenever the scrolling leaves and re-enters the correct divison.
   d3.select("#viz").style("position", "fixed");
   d3.selectAll("#map").remove();
   svg.transition().duration(300).attr("width", 500).attr("height", 500);
@@ -273,6 +266,8 @@ let barchart = () => {
   });
 };
 
+// Function to create map visualization
+// This is needed for the scrolling feature
 let geoVis = () => {
   d3.select("#viz").style("position", "relative");
   d3.selectAll("#barchart").remove();
@@ -301,22 +296,12 @@ let geoVis = () => {
     .center([-81, 31.7]);
   var path = d3.geoPath().projection(projection);
 
+  // Data access
   var map = d3.json("map_data/ga_counties.json");
   var access = d3.csv("data/ACCESS.csv");
   var socio_data = d3.csv("data/SOCIOECONOMIC.csv");
-  // Popup for county name when hovering
-  //   var tooltip = d3
-  //     .select("body")
-  //     .append("div")
-  //     .attr("class", "tooltip")
-  //     .style("opacity", 0);
 
-  //   var newDataTip = d3
-  //     .select("body")
-  //     .append("div")
-  //     .attr("class", "newDataTip")
-  //     .style("opacity", 0);
-
+  // Creates color scale for dataset
   var colorScale = d3
     .scaleLinear()
     .range(["#fef0d9", "#fdcc8a", "#fc8d59", "#e34a33", "#b30000"])
@@ -339,6 +324,7 @@ let geoVis = () => {
     .attr("x2", "100%")
     .attr("y2", "0%");
 
+  // Creates color gradient
   linearGradient
     .selectAll("stop")
     .data(colorScale.range())
@@ -378,8 +364,7 @@ let geoVis = () => {
 
   // Promise allows multiple iterables to be passed through
   Promise.all([map, access, socio_data]).then(function (values) {
-    // console.log(values[0]);
-    // Combines map data with ACCESS data
+    // Combines map data with ACCESS and SOCIOECONOMIC data
     values[0].features.forEach(function (v_0) {
       var result = values[1].filter(function (v_1) {
         return v_1.County === v_0.properties.NAME;
@@ -393,7 +378,6 @@ let geoVis = () => {
       });
       v_0.socio_data =
         result[0] !== undefined ? result[0] : console.log("null");
-
       v_0.data.Food_Percentage =
         (parseFloat(v_0.data.PCT_LACCESS_POP15) +
           parseFloat(v_0.socio_data.POVRATE15)) /
@@ -422,6 +406,7 @@ let geoVis = () => {
       .call(legendAxis);
   });
 
+  // Map mouse over function
   function mouseover(d) {
     if (d3.select(this).classed("inactive")) {
       return;
@@ -445,10 +430,12 @@ let geoVis = () => {
       .style("top", d3.event.pageY - 28 + "px");
   }
 
+  // Map Mouse out function
   function mouseout(d) {
     tooltip.transition().duration(500).style("opacity", 0);
   }
 
+  // Map Clicked Function
   function clicked(d) {
     var x, y, k;
 
@@ -526,13 +513,6 @@ let geoVis = () => {
           "Child Poverty Rate: " +
           parseFloat(d.socio_data.CHILDPOVRATE15).toFixed(2) +
           "%"
-        //   "<br/>" +
-        //   "<h2>" +
-        //   "2010" +
-        //   "</h2>" +
-        //   "Low Access: " +
-        //   parseFloat(d.data.PCT_LACCESS_POP10).toFixed(2) +
-        //   "%"
       )
       .style("left", d3.event.pageX - 400 + "px")
       .style("top", d3.event.pageY - 50 + "px");
@@ -541,11 +521,6 @@ let geoVis = () => {
       newDataTip.transition().duration(1).style("opacity", 0);
     }
 
-    var barWidth = 500,
-        barHeight = 500
-
-
-    
     g.selectAll("path")
       .classed(
         "inactive",
